@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Lucknow Shooting Academy</title>
+    
+    <!-- Google Fonts Import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ALL CSS IS NOW INSIDE THIS STYLE TAG -->
+    <style>
+        /* --- 1. SETUP & VARIABLES (ACCENT COLOR IS BLUE) --- */
+        :root {
+            --primary-bg: #111827;      /* Very Dark Blue/Gray */
+            --secondary-bg: #1F2937;    /* Dark Gray */
+            --text-primary: #F9FAFB;      /* Off-White */
+            --text-secondary: #9CA3AF;    /* Lighter Gray */
+            --accent-color: #3B82F6;      /* Vibrant Blue */
+            --accent-hover: #2563EB;      /* Darker Blue for Hover */
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* --- 2. ANIMATIONS --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0; /* Hidden by default */
+        }
+
+        .animate-on-scroll.visible {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        /* --- 3. NAVBAR & HERO --- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            text-shadow: 0 0 5px var(--accent-color);
+        }
+
+        .nav-links a {
+            margin: 0 1.5rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 400;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .login-button-nav {
+            padding: 0.6rem 1.2rem;
+            background-color: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .login-button-nav:hover {
+            background-color: var(--accent-color);
+            color: var(--primary-bg);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 90vh;
+            text-align: center;
+            padding: 0 2rem;
+            /* THIS IS THE ONLY CHANGE: Using a directly hosted image URL */
+            background: linear-gradient(rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.8)), url('https://images.unsplash.com/photo-1595505992290-db0741a337a6?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2.5rem;
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* --- 4. GENERAL SECTIONS & CARDS --- */
+        .section {
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 3px;
+            bottom: -10px;
+            left: 20%;
+            background-color: var(--accent-color);
+        }
+
+        .bg-darker {
+            background-color: var(--secondary-bg);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+
+        /* --- NEWS CARD STYLING --- */
+        .news-card {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .news-card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .news-card h3 {
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .news-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+
+        .news-card-footer {
+            padding: 0 1.5rem 1rem 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* --- GALLERY STYLING --- */
+        .gallery-item {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* --- 5. CONTACT FORM & FOOTER --- */
+        .contact-form {
+            max-width: 600px;
+            margin: 2rem auto 0 auto;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); /* Blue shadow */
+        }
+
+        .input-group ::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--accent-color);
+            color: var(--primary-bg);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background-color: var(--accent-hover);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--secondary-bg);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="index.html" class="logo">LSA</a>
+        <nav class="nav-links">
+            <a href="#news">News</a>
+            <a href="#gallery">Gallery</a>
+            <a href="#contact">Contact</a>
+        </nav>
+        <a href="login.html" class="login-button-nav">Login / Register</a>
+    </header>
+
+    <main>
+        <!-- Hero Welcome Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="animate-on-scroll">Precision, Discipline, Excellence</h1>
+                <p class="animate-on-scroll">Join the premier shooting academy in Lucknow. Sharpen your skills with expert trainers.</p>
+                <a href="#contact" class="cta-button animate-on-scroll">Inquire Now</a>
+            </div>
+        </section>
+
+        <!-- Latest News Section -->
+        <section id="news" class="section animate-on-scroll">
+            <h2>Latest News</h2>
+            <div id="news-grid" class="grid">
+                <p>Loading news...</p>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="section bg-darker animate-on-scroll">
+            <h2>Our Gallery</h2>
+            <div id="gallery-grid" class="grid">
+                <p>Loading gallery...</p>
+            </div>
+        </section>
+
+        <!-- Contact/Query Section -->
+        <section id="contact" class="section animate-on-scroll">
+            <h2>Have a Question?</h2>
+            <p>Fill out the form below and our team will get back to you shortly.</p>
+            <form id="query-form" class="contact-form">
+                <div class="input-group">
+                    <input type="text" id="name" required placeholder="Your Name">
+                </div>
+                <div class="input-group">
+                    <input type="email" id="query-email" required placeholder="Your Email">
+                </div>
+                <div class="input-group">
+                    <textarea id="message" rows="5" required placeholder="Your Message"></textarea>
+                </div>
+                <button type="submit" class="submit-button">Send Query</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Lucknow Shooting Academy. All Rights Reserved.</p>
+    </footer>
+
+    <!-- ALL JAVASCRIPT IS NOW INSIDE THIS SCRIPT TAG -->
+    <script type="module">
+        // --- FIREBASE CONFIGURATION ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- HOMEPAGE LOGIC ---
+
+        // 1. FETCH AND DISPLAY NEWS
+        const newsGrid = document.getElementById('news-grid');
+        async function fetchNews() {
+            try {
+                const newsQuery = query(collection(db, "news"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(newsQuery);
+                let newsHTML = ''; 
+
+                if (querySnapshot.empty) {
+                    newsGrid.innerHTML = '<p>No news available at the moment.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const newsData = doc.data();
+                    const date = newsData.createdAt.toDate().toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'long', day: 'numeric'
+                    });
+
+                    newsHTML += `
+                        <div class="news-card">
+                            <div class="news-card-content">
+                                <h3>${newsData.title}</h3>
+                                <p>${newsData.content}</p>
+                            </div>
+                            <div class="news-card-footer">
+                                <span>Published on ${date}</span>
+                            </div>
+                        </div>`;
+                });
+                newsGrid.innerHTML = newsHTML;
+            } catch (error) {
+                console.error("Error fetching news:", error);
+                newsGrid.innerHTML = '<p>Sorry, could not load news.</p>';
+            }
+        }
+
+        // 2. FETCH AND DISPLAY GALLERY
+        const galleryGrid = document.getElementById('gallery-grid');
+        async function fetchGallery() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "gallery"));
+                let galleryHTML = '';
+
+                if (querySnapshot.empty) {
+                    galleryGrid.innerHTML = '<p>No images in the gallery yet.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const galleryData = doc.data();
+                    galleryHTML += `
+                        <div class="gallery-item">
+                            <img src="${galleryData.imageUrl}" alt="Gallery image">
+                        </div>`;
+                });
+                galleryGrid.innerHTML = galleryHTML;
+            } catch (error) {
+                console.error("Error fetching gallery:", error);
+                galleryGrid.innerHTML = '<p>Sorry, could not load the gallery.</p>';
+            }
+        }
+
+        // 3. HANDLE QUERY FORM SUBMISSION
+        const queryForm = document.getElementById('query-form');
+        queryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('query-email').value;
+            const message = document.getElementById('message').value;
+
+            if (!name || !email || !message) {
+                alert('Please fill out all fields.');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "queries"), {
+                    name: name, email: email, message: message, submittedAt: serverTimestamp()
+                });
+                alert('Thank you for your query! We will get back to you soon.');
+                queryForm.reset();
+            } catch (error) {
+                console.error("Error submitting query: ", error);
+                alert('Sorry, there was an error sending your message. Please try again.');
+            }
+        });
+
+        // 4. SCROLL ANIMATION LOGIC
+        function setupScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            if (!animatedElements.length) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            animatedElements.forEach(element => {
+                observer.observe(element);
+            });
+        }
+
+        // 5. INITIALIZE THE PAGE
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchNews();
+            fetchGallery();
+            setupScrollAnimations();
+        });
+    </script>
+</body>
+</html>

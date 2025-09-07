@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard • LSA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: #111827; color: #F9FAFB; }
+    .container { max-width: 1000px; margin: 20px auto; padding: 20px; }
+    .card { background: #1F2937; padding: 20px; margin-bottom: 20px; border-radius: 10px; }
+    .input { width: 100%; padding: 10px; margin: 6px 0; border-radius: 6px; border: 1px solid #333; background: #0f172a; color: #fff; }
+    .btn { padding: 10px 15px; background: #3B82F6; border: none; border-radius: 6px; cursor: pointer; color: #fff; font-weight: 600; }
+    .btn:hover { background: #2563EB; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid #333; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome, <span id="adminName">Admin</span></h1>
+    <button id="btn_logout" class="btn">Logout</button>
+
+    <div class="card">
+      <h2>Gallery Manager</h2>
+      <input type="file" id="galleryFile" accept="image/*" class="input">
+      <button id="btn_upload_img" class="btn">Upload Image</button>
+      <div id="galleryList"></div>
+    </div>
+
+    <div class="card">
+      <h2>News Manager</h2>
+      <input id="news_title" class="input" placeholder="News title">
+      <textarea id="news_content" class="input" placeholder="News content"></textarea>
+      <button id="btn_publish_news" class="btn">Publish</button>
+      <div id="newsList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Students</h2>
+      <div id="studentsTable">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    // ✅ Your Firebase Config
+    const firebaseConfig = {
+  apiKey: "AIzaSyA0Bge2eKH1rFJl2qHJZDfsOApwGDMkMPI",
+  authDomain: "shootingtest1-f332f.firebaseapp.com",
+  projectId: "shootingtest1-f332f",
+  storageBucket: "shootingtest1-f332f.firebasestorage.app",
+  messagingSenderId: "1028241450044",
+  appId: "1:1028241450044:web:0c94f04b47853d012e0f39",
+  measurementId: "G-JEJVVSP9J8"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // ✅ Auth guard
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = "login.html";
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (!snap.exists() || snap.data().role !== "admin") return window.location.href = "student.html";
+      document.getElementById("adminName").innerText = snap.data().name || "Admin";
+      loadStudents(); loadNews(); loadGallery();
+    });
+
+    document.getElementById("btn_logout").addEventListener("click", async () => {
+      await signOut(auth); window.location.href = "login.html";
+    });
+
+    // ✅ Gallery
+    async function loadGallery() {
+      const q = query(collection(db, "gallery"), orderBy("createdAt","desc"));
+      const snap = await getDocs(q);
+      let html = "";
+      snap.forEach(d => {
+        const g = d.data();
+        html += `<div><img src="${g.imageUrl}" style="max-width:200px;border-radius:8px"><br><button onclick="deleteImage('${d.id}','${g.storagePath}')">Delete</button></div>`;
+      });
+      document.getElementById("galleryList").innerHTML = html || "No images.";
+    }
+
+    window.deleteImage = async (id, storagePath) => {
+      await deleteObject(ref(storage, storagePath)).catch(()=>{});
+      await updateDoc(doc(db,"gallery",id), { deletedAt: serverTimestamp() });
+      loadGallery();
+    };
+
+    document.getElementById("btn_upload_img").addEventListener("click", async () => {
+      const file = document.getElementById("galleryFile").files[0];
+      if (!file) return alert("Pick an image");
+      const path = "gallery/" + Date.now() + "_" + file.name;
+      const sref = ref(storage, path);
+      await uploadBytes(sref, file);
+      const url = await getDownloadURL(sref);
+      await addDoc(collection(db,"gallery"), { imageUrl: url, storagePath: path, createdAt: serverTimestamp() });
+      loadGallery();
+    });
+
+    // ✅ News
+    async function loadNews() {
+      const q = query(collection(db,"news"), orderBy("createdAt","desc"));
+      const snap = await getDocs(q);
+      let html = "";
+      snap.forEach(d => {
+        const n = d.data();
+        html += `<div><b>${n.title}</b><p>${n.content}</p></div><hr>`;
+      });
+      document.getElementById("newsList").innerHTML = html || "No news yet.";
+    }
+
+    document.getElementById("btn_publish_news").addEventListener("click", async () => {
+      const title = document.getElementById("news_title").value;
+      const content = document.getElementById("news_content").value;
+      if (!title || !content) return alert("Fill all fields");
+      await addDoc(collection(db,"news"), { title, content, createdAt: serverTimestamp() });
+      document.getElementById("news_title").value=""; document.getElementById("news_content").value="";
+      loadNews();
+    });
+
+    // ✅ Students
+    async function loadStudents() {
+      const q = query(collection(db,"users"), where("role","==","student"));
+      const snap = await getDocs(q);
+      let html = "<table><tr><th>Name</th><th>Email</th><th>Status</th><th>Action</th></tr>";
+      snap.forEach(d => {
+        const u = d.data();
+        html += `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.status||"active"}</td>
+          <td><button onclick="toggleStatus('${d.id}','${u.status||'active'}')">Toggle</button></td></tr>`;
+      });
+      html += "</table>";
+      document.getElementById("studentsTable").innerHTML = html;
+    }
+
+    window.toggleStatus = async (uid, status) => {
+      const next = status==="active" ? "blocked" : "active";
+      await updateDoc(doc(db,"users",uid), { status: next });
+      loadStudents();
+    };
+  </script>
+</body>
+</html>

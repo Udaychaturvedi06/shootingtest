@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Student • Shooting Academy — Dashboard</title>
+
+<!-- Chart.js for analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050617; --panel:#0f1724; --card:#111827; --accent:#00b0ff; --accent-2:#29e3a9;
+    --muted:#9aa4b2; --glass:rgba(255,255,255,0.03);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%; margin:0; font-family:'Poppins',sans-serif; background:linear-gradient(180deg,#041026 0%, #071428 60%); color:#e6f0ff}
+  a{color:inherit}
+  /* page layout */
+  .topbar{height:72px; display:flex;align-items:center;justify-content:space-between;padding:0 26px; gap:12px; background:rgba(6,10,20,0.45); backdrop-filter:blur(8px); position:sticky;top:0; z-index:40; border-bottom:1px solid rgba(255,255,255,0.03)}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand img{width:46px;height:46px;border-radius:10px;object-fit:cover;box-shadow:0 8px 18px rgba(0,0,0,0.6)}
+  .brand h1{font-size:18px;margin:0}
+  .layout{display:grid;grid-template-columns:260px 1fr;column-gap:20px;max-width:1200px;margin:22px auto;padding:0 20px}
+  /* sidebar */
+  .sidebar{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
+  .menu{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+  .menu button{background:transparent;border:none;color:var(--muted);padding:10px;border-radius:8px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;font-weight:600}
+  .menu button.active{background:linear-gradient(90deg, rgba(0,176,255,0.12), rgba(41,227,169,0.04));color:var(--accent);box-shadow:inset 0 0 30px rgba(0,176,255,0.02)}
+  .small{font-size:13px;color:var(--muted)}
+  /* main area */
+  .main{display:grid;grid-template-columns:1fr;gap:18px}
+  .card{background:linear-gradient(180deg,var(--card),rgba(0,0,0,0.08));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+  .row{display:flex;gap:18px}
+  .col{flex:1}
+  .profile-wrap{display:flex;gap:14px;align-items:center}
+  .avatar{width:82px;height:82px;border-radius:12px;object-fit:cover;border:2px solid rgba(255,255,255,0.04)}
+  .muted{color:var(--muted)}
+  .btn{background:linear-gradient(90deg,var(--accent),#00f1c6);border:none;padding:10px 14px;border-radius:10px;color:#02101a;font-weight:700;cursor:pointer}
+  .ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 12px;border-radius:8px}
+  /* progress */
+  .progress{height:18px;background:rgba(0,0,0,0.2);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,0.02)}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width 700ms cubic-bezier(.2,.9,.2,1)}
+  /* gallery */
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .gallery img{width:100%;height:90px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.03);transition:transform .25s}
+  .gallery img:hover{transform:scale(1.03)}
+  /* leaderboard */
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;text-align:left;color:var(--muted);border-bottom:1px dashed rgba(255,255,255,0.02)}
+  th{color:#fff;font-weight:700}
+  /* badges */
+  .badges{display:flex;gap:10px;flex-wrap:wrap}
+  .badge{background:linear-gradient(90deg,#fff1 20%,#fff0 60%);padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);font-weight:700;color:var(--muted)}
+  /* notification */
+  .notif{position:relative;display:inline-block}
+  .badge-dot{position:absolute;right:-6px;top:-6px;background:#ff5f6d;color:#fff;border-radius:50%;padding:4px 6px;font-size:11px;font-weight:700}
+  /* responsive */
+  @media (max-width:940px){.layout{grid-template-columns:1fr; padding:12px} .gallery{grid-template-columns:repeat(2,1fr)}}
+  /* small animations */
+  .glow{box-shadow:0 8px 40px rgba(0,176,255,0.06);transition:all .4s}
+</style>
+</head>
+<body>
+
+  <!-- topbar -->
+  <div class="topbar">
+    <a href="index1.html" class="brand" title="Go to Home">
+      <img src="logo.png" alt="logo" onerror="this.style.display='none'">
+      <div>
+        <div style="font-size:16px;font-weight:800">Lucknow Shooting Academy</div>
+        <div class="small muted">Aim • Train • Win</div>
+      </div>
+    </a>
+
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="notif">
+        <button id="btn_notif" class="ghost">🔔</button>
+        <div id="notif_count" class="badge-dot" style="display:none">0</div>
+      </div>
+      <div id="user_menu" style="display:flex;align-items:center;gap:10px">
+        <img id="mini_avatar" src="" alt="avatar" style="width:44px;height:44px;border-radius:10px;object-fit:cover;border:2px solid rgba(255,255,255,0.03)">
+        <div style="text-align:right">
+          <div id="mini_name" style="font-weight:700">Student</div>
+          <div class="small muted" id="mini_batch">Batch A</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- layout -->
+  <div class="layout">
+
+    <!-- sidebar -->
+    <aside class="sidebar card">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img id="side_avatar" src="" alt="avatar" style="width:64px;height:64px;border-radius:10px;object-fit:cover">
+        <div>
+          <div id="side_name" style="font-weight:800">Student</div>
+          <div class="small muted" id="side_email">email@example.com</div>
+        </div>
+      </div>
+
+      <div class="menu" style="margin-top:18px">
+        <button class="active" data-view="overview">🏹 Overview</button>
+        <button data-view="analytics">📈 Analytics</button>
+        <button data-view="gallery">🖼 Gallery</button>
+        <button data-view="resources">📚 Resources</button>
+        <button data-view="leaderboard">🏆 Leaderboard</button>
+        <button data-view="profile">⚙️ Profile</button>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="small muted">Progress</div>
+        <div style="height:12px;margin-top:8px" class="progress"><i id="progress_bar" style="width:0%"></i></div>
+        <div class="small muted" id="progress_text" style="margin-top:8px">0% • Bronze</div>
+      </div>
+
+      <div style="margin-top:18px">
+        <button id="btn_logout" class="btn" style="width:100%">Logout</button>
+      </div>
+    </aside>
+
+    <!-- main content -->
+    <main class="main">
+
+      <!-- Overview row -->
+      <section id="view_overview" class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h2 style="margin:0">Overview</h2>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button id="btn_newshot" class="btn">Record Shot</button>
+            <button id="btn_refresh" class="ghost">Refresh</button>
+          </div>
+        </div>
+
+        <div style="margin-top:18px" class="row">
+          <div class="col card" style="padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="small muted">Current Accuracy</div>
+                <div style="font-size:22px;font-weight:800" id="stat_accuracy">--%</div>
+              </div>
+              <div style="text-align:right">
+                <div class="small muted">Avg Score</div>
+                <div style="font-size:22px;font-weight:800" id="stat_avg">--</div>
+              </div>
+            </div>
+            <div style="margin-top:12px">
+              <canvas id="chart_score" height="100"></canvas>
+            </div>
+          </div>
+
+          <div style="width:320px;display:flex;flex-direction:column;gap:12px">
+            <div class="card" style="padding:12px">
+              <div class="small muted">Badges</div>
+              <div class="badges" id="badges_box" style="margin-top:10px"></div>
+            </div>
+            <div class="card" style="padding:12px">
+              <div class="small muted">Upcoming</div>
+              <ul id="upcoming_list" class="small muted" style="margin-top:8px;line-height:1.6">
+                <li>No upcoming sessions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Analytics -->
+      <section id="view_analytics" class="card" style="display:none">
+        <h2>Analytics</h2>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+          <div class="col card" style="padding:12px">
+            <div class="small muted">Weekly Accuracy</div>
+            <canvas id="chart_week" height="120"></canvas>
+          </div>
+          <div class="col card" style="padding:12px;min-width:300px;">
+            <div class="small muted">Shot Distribution</div>
+            <canvas id="chart_pie" height="160"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gallery -->
+      <section id="view_gallery" class="card" style="display:none">
+        <h2>Gallery</h2>
+        <div class="gallery" id="gallery_container" style="margin-top:12px"></div>
+      </section>
+
+      <!-- Resources -->
+      <section id="view_resources" class="card" style="display:none">
+        <h2>Resources</h2>
+        <div id="resources_list" style="margin-top:12px"></div>
+      </section>
+
+      <!-- Leaderboard -->
+      <section id="view_leaderboard" class="card" style="display:none">
+        <h2>Leaderboard</h2>
+        <table id="leader_table" style="margin-top:12px">
+          <thead><tr><th>Rank</th><th>Name</th><th>Avg Score</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <!-- Profile -->
+      <section id="view_profile" class="card" style="display:none">
+        <h2>Profile</h2>
+        <div class="row" style="align-items:center">
+          <div style="width:220px">
+            <img id="profile_avatar" src="" alt="avatar" class="avatar" style="width:220px;height:220px">
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <input id="file_profile" type="file" accept="image/*" style="display:none">
+              <button id="btn_upload_avatar" class="btn">Upload Photo</button>
+              <button id="btn_remove_avatar" class="ghost">Remove</button>
+            </div>
+          </div>
+
+          <div style="flex:1">
+            <div style="display:flex;gap:12px">
+              <div style="flex:1">
+                <div class="small muted">Name</div>
+                <input id="form_name" class="input" style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff">
+              </div>
+              <div style="flex:1">
+                <div class="small muted">Email</div>
+                <input id="form_email" readonly class="input" style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff">
+              </div>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:8px">
+              <button id="btn_save_profile2" class="btn">Save</button>
+              <button id="btn_change_password" class="ghost">Change Password</button>
+            </div>
+
+            <div style="margin-top:18px">
+              <div class="small muted">About</div>
+              <textarea id="form_about" rows="4" style="width:100%;margin-top:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff;padding:10px"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<!-- Firebase (module) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+  // ---------- CONFIG: Replace with your Firebase project details ----------
+  const firebaseConfig = {
+apiKey: "AIzaSyA0Bge2eKH1rFJl2qHJZDfsOApwGDMkMPI",
+authDomain: "shootingtest1-f332f.firebaseapp.com",
+projectId: "shootingtest1-f332f",
+storageBucket: "shootingtest1-f332f.firebasestorage.app",
+messagingSenderId: "1028241450044",
+appId: "1:1028241450044:web:0c94f04b47853d012e0f39",
+measurementId: "G-JEJVVSP9J8"
+};
+  // ------------------------------------------------------------------------
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // UI references
+  const miniName = document.getElementById('mini_name');
+  const miniBatch = document.getElementById('mini_batch');
+  const miniAvatar = document.getElementById('mini_avatar');
+  const sideName = document.getElementById('side_name');
+  const sideEmail = document.getElementById('side_email');
+  const sideAvatar = document.getElementById('side_avatar');
+  const profileAvatar = document.getElementById('profile_avatar');
+  const formName = document.getElementById('form_name');
+  const formEmail = document.getElementById('form_email');
+  const formAbout = document.getElementById('form_about');
+  const progressBar = document.getElementById('progress_bar');
+  const progressText = document.getElementById('progress_text');
+  const badgesBox = document.getElementById('badges_box');
+  const notifCount = document.getElementById('notif_count');
+
+  // view switching
+  document.querySelectorAll('.menu button').forEach(btn=>{
+    btn.addEventListener('click', ()=> {
+      document.querySelectorAll('.menu button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const view = 'view_' + btn.dataset.view;
+      document.querySelectorAll('main section').forEach(s=>s.style.display='none');
+      document.getElementById(view).style.display = 'block';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+
+  // sign-out
+  document.getElementById('btn_logout').addEventListener('click', async ()=>{
+    await signOut(auth);
+    window.location.href = 'login.html';
+  });
+
+  // file upload profile
+  const fileInput = document.getElementById('file_profile');
+  document.getElementById('btn_upload_avatar').addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', async (e) => {
+    const f = e.target.files[0];
+    if(!f) return;
+    const user = auth.currentUser;
+    const path = `profiles/${user.uid}/${Date.now()}_${f.name}`;
+    const sref = ref(storage, path);
+    await uploadBytes(sref, f);
+    const url = await getDownloadURL(sref);
+    await updateDoc(doc(db,'users',user.uid), { photoURL: url });
+    profileAvatar.src = url; miniAvatar.src = url; sideAvatar.src = url;
+    alert('Profile photo updated');
+  });
+
+  document.getElementById('btn_remove_avatar').addEventListener('click', async ()=>{
+    const user = auth.currentUser;
+    const snap = await getDoc(doc(db,'users',user.uid));
+    const path = snap.data()?.photoPath;
+    if(path){
+      await deleteObject(ref(storage,path)).catch(()=>{});
+    }
+    await updateDoc(doc(db,'users',user.uid), { photoURL: '', photoPath: '' });
+    profileAvatar.src = ''; miniAvatar.src = ''; sideAvatar.src = '';
+    alert('Removed');
+  });
+
+  // save profile
+  document.getElementById('btn_save_profile2').addEventListener('click', async ()=>{
+    const user = auth.currentUser;
+    await updateDoc(doc(db,'users',user.uid), { name: formName.value.trim(), about: formAbout.value.trim() });
+    sideName.innerText = formName.value.trim();
+    miniName.innerText = formName.value.trim();
+    alert('Saved');
+  });
+
+  // record a quick shot (demo)
+  document.getElementById('btn_newshot').addEventListener('click', async ()=>{
+    // this is a demo: in real app you'd open a form/modal to record shot details
+    alert('Demo: shot recorded (fake). Implement capture UI in production.');
+  });
+
+  // ----------------- data loaders -----------------
+  onAuthStateChanged(auth, async user=>{
+    if(!user) return window.location.href='login.html';
+    // load user doc
+    const uref = doc(db,'users',user.uid);
+    const usnap = await getDoc(uref);
+    if(!usnap.exists()){ console.error('No user doc'); return; }
+    const u = usnap.data();
+    // redirect admin
+    if(u.role === 'admin') { window.location.href = 'admin.html'; return; }
+    // populate UI
+    formName.value = u.name || user.displayName || '';
+    formEmail.value = u.email || user.email || '';
+    formAbout.value = u.about || '';
+    sideName.innerText = u.name || user.displayName || 'Student';
+    sideEmail.innerText = u.email || user.email || '';
+    miniName.innerText = u.name || user.displayName || 'Student';
+    miniBatch.innerText = u.batch || 'Batch A';
+    if(u.photoURL){
+      profileAvatar.src = u.photoURL; miniAvatar.src = u.photoURL; sideAvatar.src = u.photoURL;
+    } else {
+      profileAvatar.src = 'https://via.placeholder.com/220x220?text=LSA';
+      miniAvatar.src = 'https://via.placeholder.com/44?text=LS';
+      sideAvatar.src = 'https://via.placeholder.com/64?text=LS';
+    }
+    // load modules
+    loadProgress(user.uid);
+    loadNews();
+    loadGallery();
+    loadLeaderboard();
+    loadResources();
+    loadAnalytics();
+    loadNotifications();
+  });
+
+  // load progress & badges (from 'progress' collection or user doc)
+  async function loadProgress(uid){
+    // try user doc progress field first
+    const us = await getDoc(doc(db,'users',uid));
+    const p = us.data()?.progress || { percent:0, level:'Bronze', badges:[] };
+    const percent = Math.min(100, p.percent || 0);
+    progressBar.style.width = percent + '%';
+    progressText.innerText = `${percent}% • ${p.level || 'Bronze'}`;
+    badgesBox.innerHTML = '';
+    (p.badges || []).forEach(b=>{
+      const el = document.createElement('div'); el.className='badge'; el.innerText = b;
+      badgesBox.appendChild(el);
+    });
+  }
+
+  // NEWS
+  async function loadNews(){
+    const q = query(collection(db,'news'), orderBy('createdAt','desc'), limit(6));
+    const snap = await getDocs(q);
+    const container = document.getElementById('news_feed');
+    container.innerHTML = '';
+    let i=0;
+    snap.forEach(d=>{
+      i++;
+      const n = d.data();
+      const el = document.createElement('div'); el.className='small muted';
+      el.innerHTML = `<div style="font-weight:800;color:#fff">${n.title}</div><div style="margin-top:6px">${n.content}</div>`;
+      container.appendChild(el);
+      if(i< snap.size) container.appendChild(document.createElement('hr'));
+    });
+    if(snap.size===0) container.innerHTML = '<div class="small muted">No announcements yet</div>';
+  }
+
+  // GALLERY
+  async function loadGallery(){
+    const q = query(collection(db,'gallery'), orderBy('createdAt','desc'), limit(9));
+    const snap = await getDocs(q);
+    const c = document.getElementById('gallery_container');
+    c.innerHTML = '';
+    snap.forEach(d=>{
+      const g = d.data();
+      const img = document.createElement('img'); img.src = g.imageUrl; img.alt = g.title || 'event';
+      c.appendChild(img);
+    });
+    if(snap.size===0) c.innerHTML = '<div class="small muted">No images yet</div>';
+  }
+
+  // RESOURCES
+  async function loadResources(){
+    const q = query(collection(db,'resources'), orderBy('createdAt','desc'), limit(10));
+    const snap = await getDocs(q);
+    const container = document.getElementById('resources_list');
+    container.innerHTML = '';
+    snap.forEach(d=>{
+      const r = d.data();
+      const el = document.createElement('div'); el.className='small muted';
+      el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 6px">
+        <div><strong style="color:#fff">${r.title}</strong><div style="font-size:13px">${r.desc||''}</div></div>
+        <div><a class="btn" href="${r.fileUrl}" target="_blank" rel="noopener">Open</a></div>
+      </div>`;
+      container.appendChild(el);
+    });
+    if(snap.size===0) container.innerHTML = '<div class="small muted">No resources yet</div>';
+  }
+
+  // LEADERBOARD
+  async function loadLeaderboard(){
+    const q = query(collection(db,'leaderboard'), orderBy('avgScore','desc'), limit(10));
+    const snap = await getDocs(q);
+    const tbody = document.querySelector('#leader_table tbody'); tbody.innerHTML='';
+    let rank=1;
+    snap.forEach(d=>{
+      const u = d.data();
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td style="color:#fff">${rank++}</td><td style="color:#fff">${u.name}</td><td>${u.avgScore}</td>`;
+      tbody.appendChild(tr);
+    });
+    if(snap.size===0) tbody.innerHTML = '<tr><td colspan="3" class="muted">No leaderboard data</td></tr>';
+  }
+
+  // Notifications demo (count unread in 'notifications' collection assigned to user)
+  async function loadNotifications(){
+    // example: notifications collection with field 'to' equals uid and 'read' boolean
+    try{
+      const user = auth.currentUser; if(!user) return;
+      const q = query(collection(db,'notifications'), orderBy('createdAt','desc'));
+      const snap = await getDocs(q);
+      // very simplified: count unread where to==user.uid
+      let unread = 0;
+      snap.forEach(d=>{
+        const n = d.data(); if((n.to === user.uid) && !n.read) unread++;
+      });
+      if(unread>0){ notifCount.style.display='block'; notifCount.innerText = unread; } else { notifCount.style.display='none'; }
+    }catch(e){ console.warn(e) }
+  }
+
+  // ANALYTICS (Chart.js)
+  let chartScore, chartWeek, chartPie;
+  async function loadAnalytics(){
+    // practice scores collection sample: documents with {score: number, accuracy: number, createdAt: timestamp}
+    // fetch last 12 entries
+    const q = query(collection(db,'progress'), orderBy('createdAt','desc'), limit(12));
+    const snap = await getDocs(q);
+    const data = [];
+    snap.forEach(d=> data.push(d.data()));
+    data.reverse(); // oldest -> newest
+    const labels = data.map((_,i)=>`#${i+1}`);
+    const scores = data.map(x=> x.score || 0);
+    const accur = data.length ? Math.round((data.reduce((s,a)=>s+(a.accuracy||0),0)/data.length)*10)/10 : 0;
+    const avg = data.length ? Math.round((scores.reduce((a,b)=>a+b,0)/scores.length)*10)/10 : 0;
+
+    document.getElementById('stat_accuracy').innerText = (accur||0) + '%';
+    document.getElementById('stat_avg').innerText = avg || '--';
+
+    // main chart
+    const ctx = document.getElementById('chart_score').getContext('2d');
+    if(chartScore) chartScore.destroy();
+    chartScore = new Chart(ctx,{ type:'line', data:{ labels, datasets:[{ label:'Score', data:scores, tension:0.3, borderWidth:2, borderColor:'#00e5ff', backgroundColor:'rgba(0,224,255,0.06)', fill:true }] }, options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} } });
+
+    // weekly small chart mock
+    const wk = document.getElementById('chart_week').getContext('2d');
+    if(chartWeek) chartWeek.destroy();
+    const wkLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const wkData = wkLabels.map(()=> Math.round(50 + Math.random()*40));
+    chartWeek = new Chart(wk,{ type:'bar', data:{labels:wkLabels, datasets:[{label:'Accuracy',data:wkData,backgroundColor:'#00b0ff'}]}, options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} } });
+
+    // pie distribution
+    const pie = document.getElementById('chart_pie').getContext('2d');
+    if(chartPie) chartPie.destroy();
+    chartPie = new Chart(pie,{ type:'doughnut', data:{ labels:['Bullseye','Inner','Outer','Miss'], datasets:[{ data:[Math.random()*30+20, Math.random()*30+20, Math.random()*20+10, Math.random()*20], backgroundColor:['#00e5ff','#29e3a9','#ffd166','#ff5f6d']} ] }, options:{ plugins:{legend:{position:'bottom'}} } });
+  }
+
+  // refresh button
+  document.getElementById('btn_refresh').addEventListener('click', ()=> {
+    loadNews(); loadGallery(); loadLeaderboard(); loadAnalytics(); loadResources(); loadNotifications();
+    alert('Refreshed');
+  });
+
+  // small initialization to avoid errors if Chart.js loads late
+  window.addEventListener('load', ()=>{ if(typeof Chart === 'undefined'){ console.warn('Chart.js missing'); } });
+</script>
+
+</body>
+</html>

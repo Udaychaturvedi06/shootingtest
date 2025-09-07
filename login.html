@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shooting Academy • Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* 🔹 Header with logo/name */
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+    .header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .header:hover {
+      color: var(--accent);
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    .wrapper {
+      display: flex;
+      gap: 2rem;
+      max-width: 1000px;
+      width: 100%;
+      padding: 2rem;
+    }
+    .card {
+      flex: 1;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+      transform: translateY(20px);
+      opacity: 0;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+    .card:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    h2 {
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h2 svg {
+      width: 28px;
+      height: 28px;
+      color: var(--accent);
+    }
+    .input {
+      width: 100%;
+      padding: 0.9rem;
+      margin: 0.6rem 0;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: var(--text);
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .input:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 6px var(--accent);
+    }
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+    .btn::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.2);
+      transition: all 0.4s;
+    }
+    .btn:hover::after {
+      left: 100%;
+    }
+    .muted { color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem; }
+    @keyframes fadeInUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    /* background shooting target */
+    .target-bg {
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, transparent 40%, var(--accent) 41%, transparent 43%),
+                  radial-gradient(circle, transparent 60%, var(--accent) 61%, transparent 63%),
+                  radial-gradient(circle, transparent 80%, var(--accent) 81%, transparent 83%);
+      border-radius: 50%;
+      opacity: 0.08;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🔹 Logo/Name linked to home -->
+  <a href="index1.html" class="header">
+    <img src="logo.png" alt="LSA Logo"> <!-- replace with your logo -->
+    Lucknow Shooting Academy
+  </a>
+
+  <div class="wrapper">
+    <!-- Sign In -->
+    <div class="card">
+      <div class="target-bg"></div>
+      <h2>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="6"/>
+          <circle cx="12" cy="12" r="2"/>
+        </svg>
+        Sign In
+      </h2>
+      <input id="li_email" class="input" type="email" placeholder="Email">
+      <input id="li_password" class="input" type="password" placeholder="Password">
+      <button id="btn_login" class="btn">Login</button>
+      <p class="muted">Enter your student or admin credentials.</p>
+    </div>
+
+    <!-- Register -->
+    <div class="card">
+      <div class="target-bg"></div>
+      <h2>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M12 14c3.866 0 7 3.134 7 7H5c0-3.866 3.134-7 7-7z"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Register
+      </h2>
+      <input id="su_name" class="input" type="text" placeholder="Full Name">
+      <input id="su_email" class="input" type="email" placeholder="Email">
+      <input id="su_password" class="input" type="password" placeholder="Password (min 6)">
+      <input id="su_admin_key" class="input" type="text" placeholder="Admin Access Key (optional)">
+      <button id="btn_signup" class="btn">Register</button>
+      <p class="muted">Students sign up directly. Admins need a special key.</p>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // ✅ Your Firebase Config
+   const firebaseConfig = {
+apiKey: "AIzaSyA0Bge2eKH1rFJl2qHJZDfsOApwGDMkMPI",
+authDomain: "shootingtest1-f332f.firebaseapp.com",
+projectId: "shootingtest1-f332f",
+storageBucket: "shootingtest1-f332f.firebasestorage.app",
+messagingSenderId: "1028241450044",
+appId: "1:1028241450044:web:0c94f04b47853d012e0f39",
+measurementId: "G-JEJVVSP9J8"
+};
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const ADMIN_KEY = "LSA-ADMIN-2025";
+
+    async function routeByRole(uid) {
+      const snap = await getDoc(doc(db, "users", uid));
+      const role = snap.exists() ? snap.data().role : "student";
+      if (role === "admin") window.location.href = "admin.html";
+      else window.location.href = "student.html";
+    }
+
+    document.getElementById("btn_login").addEventListener("click", async () => {
+      const email = document.getElementById("li_email").value.trim();
+      const password = document.getElementById("li_password").value;
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        await routeByRole(cred.user.uid);
+      } catch (e) {
+        alert("Login failed: " + e.message);
+      }
+    });
+
+    document.getElementById("btn_signup").addEventListener("click", async () => {
+      const name = document.getElementById("su_name").value.trim();
+      const email = document.getElementById("su_email").value.trim();
+      const password = document.getElementById("su_password").value;
+      const key = document.getElementById("su_admin_key").value.trim();
+      if (!name || !email || !password) return alert("Fill all fields");
+      const isAdmin = (key && key === ADMIN_KEY);
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: name });
+        await setDoc(doc(db, "users", cred.user.uid), {
+          uid: cred.user.uid,
+          name, email,
+          role: isAdmin ? "admin" : "student",
+          status: "active",
+          createdAt: serverTimestamp()
+        });
+        alert("Account created!");
+        await routeByRole(cred.user.uid);
+      } catch (e) {
+        alert("Signup failed: " + e.message);
+      }
+    });
+  </script>
+</body>
+</html>
